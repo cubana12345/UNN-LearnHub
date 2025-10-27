@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNN-Learn Hub</title>
+    
+
+<script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#005792', /* Dark Blue - Academic look */
+                        'secondary': '#00bfa5', /* Teal - Vibrant accent */
+                        'accent': '#ffc107', /* Amber - Alert/Featured */
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    
+
+<header class="bg-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <h1 class="text-3xl font-extrabold text-primary">UNN-<span class="text-gray-800">Learn Hub</span></h1>
+            <button id="auth-button" class="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg shadow-md hover:bg-opacity-90 transition">
+                Teacher Login
+            </button>
+        </div>
+    </header>
+
+    
+
+<main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+
+        
+
+<div id="global-message-box" class="mb-4 hidden p-4 rounded-xl font-medium transition-all duration-300 transform opacity-0"></div>
+
+        
+
+<section id="teacher-dashboard" class="bg-white p-6 rounded-xl shadow-2xl mb-8 border-2 border-secondary hidden">
+            <h2 class="text-2xl font-bold text-secondary mb-4">Upload New Resource</h2>
+            <form id="upload-form" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="text" id="resource-title" required placeholder="Resource Title (e.g., Quantum Mechanics)" class="p-3 border border-gray-300 rounded-lg focus:ring-secondary focus:border-secondary">
+                    <select id="resource-department" required class="p-3 border border-gray-300 rounded-lg focus:ring-secondary focus:border-secondary bg-white">
+                        <option value="" disabled selected>Department</option>
+                        <option value="Science">Science</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Arts">Arts</option>
+                        <option value="Management">Management</option>
+                    </select>
+                     <select id="resource-type" required class="p-3 border border-gray-300 rounded-lg focus:ring-secondary focus:border-secondary bg-white">
+                        <option value="" disabled selected>Resource Type</option>
+                        <option value="Lecture Notes">Lecture Notes</option>
+                        <option value="Exam Guide">Exam Guide</option>
+                        <option value="Video">Video Link</option>
+                    </select>
+                </div>
+                
+                
+
+<div class="flex flex-col space-y-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <label for="resource-file" class="block text-sm font-semibold text-gray-700">1. Upload File (PDF/DOCX) or 2. Use Text Link/Description</label>
+                    <input type="file" id="resource-file" accept=".pdf,.doc,.docx" class="block w-full text-sm text-gray-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-primary/10 file:text-primary
+                        hover:file:bg-primary/20 cursor-pointer
+                    ">
+
+                    
+
+<div class="flex items-end space-x-2">
+                        <textarea id="resource-description-text" rows="2" placeholder="Paste a URL, or a detailed description/access instruction..." class="flex-grow p-3 w-full border border-gray-300 rounded-lg focus:ring-secondary focus:border-secondary"></textarea>
+                        <button type="button" id="generate-description-btn" class="px-3 py-3 bg-accent text-gray-800 font-semibold rounded-lg shadow-md hover:bg-yellow-600 transition flex items-center justify-center" title="Generate engaging resource description using AI">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+
+<div id="description-loading" class="text-sm text-primary font-medium hidden flex items-center">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Generating description...
+                </div>
+                <button type="submit" class="w-full md:w-auto px-6 py-2 bg-secondary text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition">
+                    Upload Resource
+                </button>
+                <p id="upload-message" class="text-sm text-green-700 font-medium hidden">Resource uploaded successfully!</p>
+            </form>
+        </section>
+
+        
+
+<div class="bg-white p-5 rounded-xl shadow-lg mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Find Resources Fast</h2>
+            <div class="flex flex-col md:flex-row gap-4">
+                <input type="text" id="search-input" placeholder="Search by title, department, or lecturer..." class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                <select id="filter-department" class="w-full md:w-48 p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary bg-white">
+                    <option value="">All Departments</option>
+                    <option value="Science">Science</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Arts">Arts</option>
+                    <option value="Management">Management</option>
+                </select>
+            </div>
+        </div>
+
+        
+
+<section id="featured" class="mb-10">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.193a1.5 1.5 0 012.902 0l1.751 5.397a1.5 1.5 0 001.423 1.037h5.678a1.5 1.5 0 01.905 2.625l-4.596 3.32a1.5 1.5 0 00-.54 1.637l1.751 5.397a1.5 1.5 0 01-2.316 1.685l-4.596-3.32a1.5 1.5 0 00-1.808 0l-4.596 3.32a1.5 1.5 0 01-2.316-1.685l1.751-5.397a1.5 1.5 0 00-.54-1.637l-4.596-3.32a1.5 1.5 0 01.905-2.625h5.678a1.5 1.5 0 001.423-1.037l1.751-5.397z"/>
+                </svg>
+                Featured Resources
+            </h2>
+            <div id="featured-resources-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+
+</div>
+        </section>
+
+        
+
+<section id="resources" class="mb-10">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21h7a2 2 0 002-2v-4M12 21V9m0 12v-2M12 9l-7-4v12l7 4m0-12l7-4m-7 4l-7 4m0 0L3 17V5l7 4v12l-7 4M10 5l4 2 2-2M10 5l4 2M3 5l7 4m0 0l7-4" />
+                </svg>
+                All Available Resources
+            </h2>
+            <div id="resource-list" class="space-y-4">
+                
+
+</div>
+            <p id="no-results" class="text-center py-10 text-gray-500 text-lg hidden">No resources match your search criteria.</p>
+        </section>
+
+        
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+
+<section id="calendars">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Department Calendars
+                </h2>
+                <div class="bg-white p-5 rounded-xl shadow-md space-y-4">
+                    <div class="border-l-4 border-primary p-3 bg-blue-50">
+                        <h3 class="font-bold text-lg text-primary">Engineering Faculty</h3>
+                        <p class="text-sm text-gray-700">Oct 28: Final Year Project Submission Deadline.</p>
+                    </div>
+                    <div class="border-l-4 border-secondary p-3 bg-green-50">
+                        <h3 class="font-bold text-lg text-secondary">Science Faculty</h3>
+                        <p class="text-sm text-gray-700">Nov 15: General Studies (GST) Exam Schedule Posted.</p>
+                    </div>
+                </div>
+            </section>
+
+            
+
+<section id="forums-feedback">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4.832-1.258l-2.455.982a1 1 0 01-1.226-1.226l.982-2.455A9.864 9.864 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    Student Feedback & Forums
+                </h2>
+                <div class="space-y-6">
+                    
+
+<div class="bg-white p-5 rounded-xl shadow-md">
+                        <h3 class="font-semibold text-gray-800 mb-2">Popular Forum Topics:</h3>
+                        <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                            <li>Seeking help on **Thermodynamics** concepts.</li>
+                            <li>Discussion: Best revision strategies for **Exams**.</li>
+                        </ul>
+                        <a href="#" class="mt-2 inline-block text-sm text-primary hover:underline">Go to Forums &rarr;</a>
+                    </div>
+                     
+
+<form id="feedback-form" class="bg-white p-5 rounded-xl shadow-md border-t-4 border-primary">
+                        <h3 class="font-semibold text-lg text-primary mb-3">Submit Anonymous Feedback</h3>
+                        <textarea id="feedback-text" rows="3" required placeholder="What can we improve about the Hub?" class="p-3 w-full border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"></textarea>
+                        <button type="submit" class="w-full px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-opacity-90 transition mt-2">
+                            Send Feedback
+                        </button>
+                        <p id="feedback-message" class="text-sm text-green-700 font-medium mt-2 hidden">Feedback received. Thank you!</p>
+                    </form>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    
+
+<footer class="bg-gray-800 text-white mt-10 py-6 text-center">
+        <p class="text-sm">&copy; 2025 UNN-Learn Hub. Empowering Education.</p>
+    </footer>
+
+    
+
+<div id="login-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center hidden">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm m-4 transform transition-all">
+            <h2 class="text-2xl font-bold text-primary mb-4">Teacher Login</h2>
+            <p class="text-sm text-gray-600 mb-4">Use any credentials to simulate login.</p>
+            <form id="login-form" class="space-y-4">
+                <input type="text" id="login-username" required placeholder="Username or Staff ID" class="p-3 w-full border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                <input type="password" id="login-password" required placeholder="Password" class="p-3 w-full border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                <button type="submit" class="w-full px-4 py-2 bg-secondary text-white font-semibold rounded-lg hover:bg-green-700 transition">
+                    Login
+                </button>
+                <p id="login-error" class="text-sm text-red-600 font-medium hidden">Invalid credentials. Try again.</p>
+            </form>
+            <button onclick="closeLoginModal()" class="mt-4 text-sm text-gray-500 hover:text-gray-700 w-full">Close</button>
+        </div>
+    </div>
+
+    
+
+<div id="explanation-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-lg m-4 transform transition-all">
+            <h2 id="modal-title" class="text-xl font-bold text-primary mb-3"></h2>
+            <div id="modal-content" class="text-gray-700 max-h-96 overflow-y-auto mb-4 p-2 bg-gray-50 rounded-lg whitespace-pre-wrap">
+                
+
+<div class="text-center py-8">
+                    <svg class="animate-spin h-8 w-8 text-primary mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="mt-2 text-primary">Generating explanation...</p>
+                </div>
+            </div>
+            <div id="modal-sources" class="text-xs text-gray-500 italic mt-2 border-t pt-2"></div>
+            <button onclick="closeExplanationModal()" class="w-full mt-4 px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-opacity-90 transition">
+                Got it!
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        // --- API & FIREBASE SETUP (Mandatory for deployment environment) ---
+        const apiKey = "";
+        const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
+        const GENERATION_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+
+        // --- DATA AND STATE MANAGEMENT ---
+        const RESOURCE_KEY = 'UNN_Learn_Hub_resources';
+        let isLoggedIn = false;
+        let currentUploader = 'Guest Lecturer';
+
+        const initialResources = [
+            { id: 'r1', title: 'Introduction to Computer Science', department: 'Engineering', type: 'Lecture Notes', uploader: 'Dr. Okafor', featured: true, link: 'https://mock-lecture-notes.com/intro-cs' },
+            { id: 'r2', title: 'Effective Communication Skills', department: 'Arts', type: 'Exam Guide', uploader: 'Prof. Uche', featured: true, link: '[MOCK_FILE]: Syllabus_2025.pdf (520 KB)' },
+            { id: 'r3', title: 'Calculus I Problem Set', department: 'Science', type: 'Exam Guide', uploader: 'Mr. David', featured: false, link: 'https://mock-math-resources.com/problem-set' },
+            { id: 'r4', title: 'Financial Management Principles', department: 'Management', type: 'Video', uploader: 'Ms. Ngozi', featured: false, link: 'Video link will be emailed separately.' },
+        ];
+
+        // Functions for mock persistence
+        const loadResources = () => {
+            const stored = localStorage.getItem(RESOURCE_KEY);
+            return stored ? JSON.parse(stored) : initialResources;
+        };
+        const saveResources = (res) => localStorage.setItem(RESOURCE_KEY, JSON.stringify(res));
+
+        let resources = loadResources();
+
+        // --- DOM ELEMENTS ---
+        const resourceListEl = document.getElementById('resource-list');
+        const featuredListEl = document.getElementById('featured-resources-list');
+        const teacherDashboardEl = document.getElementById('teacher-dashboard');
+        const authButton = document.getElementById('auth-button');
+        const loginModal = document.getElementById('login-modal');
+        const loginForm = document.getElementById('login-form');
+        const uploadForm = document.getElementById('upload-form');
+        const searchInput = document.getElementById('search-input');
+        const filterDepartment = document.getElementById('filter-department');
+        const noResultsEl = document.getElementById('no-results');
+        const globalMessageBox = document.getElementById('global-message-box');
+        const descriptionLoading = document.getElementById('description-loading');
+        
+        // NEW ELEMENTS
+        const resourceFileInput = document.getElementById('resource-file');
+        const resourceDescriptionTextarea = document.getElementById('resource-description-text');
+        
+        const explanationModal = document.getElementById('explanation-modal');
+
+        // --- UTILITIES ---
+
+        /**
+         * Shows a temporary, non-blocking message box for feedback.
+         */
+        const showTemporaryMessage = (message, tailwindClasses) => {
+            globalMessageBox.className = 'mb-4 p-4 rounded-xl font-medium transition-all duration-300 transform opacity-100 ' + tailwindClasses;
+            globalMessageBox.textContent = message;
+            globalMessageBox.classList.remove('hidden');
+
+            // Hide after 4 seconds
+            setTimeout(() => {
+                globalMessageBox.classList.add('opacity-0');
+                globalMessageBox.classList.add('hidden');
+            }, 4000);
+        };
+
+        const isUrl = (string) => {
+            // Check for mock file marker first
+            if (string.startsWith('[MOCK_FILE]:')) return false; 
+            return string.startsWith('http://') || string.startsWith('https://');
+        };
+        
+        const isMockFile = (string) => {
+            return string.startsWith('[MOCK_FILE]:');
+        }
+
+        /**
+         * Wrapper for fetch with exponential backoff for API calls.
+         */
+        const exponentialBackoffFetch = async (url, options, maxRetries = 5) => {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) {
+                        return response.json();
+                    } else if (response.status === 429 || response.status >= 500) {
+                        const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                        if (i < maxRetries - 1) {
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                        } else {
+                            throw new Error(`API failed after ${maxRetries} retries.`);
+                        }
+                    } else {
+                        const errorBody = await response.json();
+                        throw new Error(`API request failed with status ${response.status}: ${errorBody.error.message}`);
+                    }
+                } catch (error) {
+                    if (i === maxRetries - 1) throw error;
+                    // Retry logic continues
+                }
+            }
+        };
+
+        // --- GEMINI API FUNCTIONS ---
+
+        /**
+         * LLM Feature 1: Generates an engaging description for a resource.
+         */
+        const generateResourceDescription = async () => {
+            const title = document.getElementById('resource-title').value.trim();
+            const type = document.getElementById('resource-type').value;
+
+            if (!title || !type) {
+                showTemporaryMessage('Please enter a Resource Title and select a Resource Type first.', 'bg-accent/20 text-accent border border-accent');
+                return;
+            }
+
+            descriptionLoading.classList.remove('hidden');
+
+            const systemPrompt = "You are a friendly, engaging academic assistant. Your task is to write a single, short (2-3 sentence) paragraph to excite students about this resource. Focus on why it is useful for their studies. Do not use markdown formatting.";
+            const userQuery = `Write a description for a ${type} titled "${title}".`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const result = await exponentialBackoffFetch(GENERATION_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "Could not generate description. Try again.";
+                resourceDescriptionTextarea.value = text.trim();
+                showTemporaryMessage('✨ Description generated successfully! You can now edit and upload.', 'bg-secondary/20 text-secondary border border-secondary');
+
+            } catch (error) {
+                console.error("Gemini API Error (Description):", error);
+                showTemporaryMessage('Error generating description. Check console.', 'bg-red-100 text-red-700 border border-red-400');
+            } finally {
+                descriptionLoading.classList.add('hidden');
+            }
+        };
+
+
+        /**
+         * LLM Feature 2: Explains a resource concept with search grounding.
+         */
+        const explainResourceConcept = async (title, department) => {
+            openExplanationModal(title);
+
+            const modalContentEl = document.getElementById('modal-content');
+            const modalSourcesEl = document.getElementById('modal-sources');
+
+            // Show loading state
+            modalContentEl.innerHTML = `
+                <div class="text-center py-8">
+                    <svg class="animate-spin h-8 w-8 text-primary mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="mt-2 text-primary">Searching and generating explanation for ${title}...</p>
+                </div>
+            `;
+            modalSourcesEl.innerHTML = '';
+
+            const systemPrompt = `You are a concise academic tutor for university students. Based on real-time web search results, provide a brief, one-paragraph explanation of the core concept in a friendly, encouraging tone. Tailor the explanation to a student in the ${department} department. Include a brief introductory sentence and conclude with a practical application or benefit.`;
+            const userQuery = `What is the core concept of the resource titled "${title}"?`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                tools: [{ "google_search": {} }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const result = await exponentialBackoffFetch(GENERATION_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const candidate = result.candidates?.[0];
+                const text = candidate?.content?.parts?.[0]?.text || "Sorry, I could not find a clear explanation for this topic at the moment.";
+
+                // Extract and format sources
+                let sourcesHtml = '';
+                const groundingMetadata = candidate?.groundingMetadata;
+                if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                    const sources = groundingMetadata.groundingAttributions
+                        .map(attribution => ({ uri: attribution.web?.uri, title: attribution.web?.title }))
+                        .filter(source => source.uri && source.title);
+
+                    if (sources.length > 0) {
+                        sourcesHtml = '<p class="font-bold mb-1">Sources Used:</p>';
+                        sourcesHtml += sources.map((s, i) =>
+                            `<p class="truncate"><a href="${s.uri}" target="_blank" class="text-blue-500 hover:underline">${i + 1}. ${s.title}</a></p>`
+                        ).join('');
+                    }
+                }
+
+                modalContentEl.innerHTML = text.replace(/\n/g, '<br/>'); // Preserve line breaks
+                modalSourcesEl.innerHTML = sourcesHtml;
+
+            } catch (error) {
+                console.error("Gemini API Error (Concept Explain):", error);
+                modalContentEl.innerHTML = `<p class="text-red-600">Failed to connect to the tutor AI. Please try again later.</p>`;
+                modalSourcesEl.innerHTML = '';
+            }
+        };
+
+
+        // --- MODAL FUNCTIONS ---
+
+        const openExplanationModal = (title) => {
+            document.getElementById('modal-title').textContent = `Concept Explanation: ${title}`;
+            explanationModal.classList.remove('hidden');
+        };
+
+        const closeExplanationModal = () => {
+            explanationModal.classList.add('hidden');
+            // Reset content/loading state for next time
+            document.getElementById('modal-content').innerHTML = '';
+            document.getElementById('modal-sources').innerHTML = '';
+        };
+
+        const openLoginModal = () => {
+            loginModal.classList.remove('hidden');
+        };
+
+        const closeLoginModal = () => {
+            loginModal.classList.add('hidden');
+            document.getElementById('login-error').classList.add('hidden');
+            loginForm.reset();
+        };
+
+
+        // --- LOGIN/AUTH FUNCTIONS ---
+
+        const handleLogin = (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            // Mock authentication: any non-empty username works
+            if (username.trim()) {
+                isLoggedIn = true;
+                currentUploader = username;
+                closeLoginModal();
+                updateAuthUI();
+                renderAllContent();
+                showTemporaryMessage(`Welcome, ${currentUploader}! You can now upload resources.`, 'bg-secondary/20 text-secondary border border-secondary');
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        };
+
+        const handleLogout = () => {
+            isLoggedIn = false;
+            currentUploader = 'Guest Lecturer';
+            updateAuthUI();
+            renderAllContent();
+            showTemporaryMessage('You have been logged out.', 'bg-red-100 text-red-700 border border-red-400');
+        };
+
+        const updateAuthUI = () => {
+            if (isLoggedIn) {
+                authButton.textContent = `Logout (${currentUploader})`;
+                authButton.onclick = handleLogout;
+                teacherDashboardEl.classList.remove('hidden');
+            } else {
+                authButton.textContent = 'Teacher Login';
+                authButton.onclick = openLoginModal;
+                teacherDashboardEl.classList.add('hidden');
+            }
+        };
+
+        // --- RENDERING & FILTERING FUNCTIONS ---
+
+        /**
+         * Creates the HTML for a single resource card.
+         */
+        const createResourceCard = (resource, isFeatured = false) => {
+            const baseClass = 'bg-white p-4 rounded-xl shadow-md transition flex flex-col sm:flex-row justify-between items-start sm:items-center';
+            const cardClass = isFeatured ? baseClass + ' border-2 border-accent' : baseClass + ' border-l-4 border-primary';
+
+            // Determine what icon and text to show for the link
+            let accessButtonText = "Access";
+            let accessLinkClass = "access-resource";
+            let accessIcon = '';
+            
+            if (isUrl(resource.link)) {
+                accessButtonText = "View Link";
+                accessLinkClass = "external-link";
+                accessIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>`;
+            } else if (isMockFile(resource.link)) {
+                accessButtonText = "Download File";
+                accessIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>`;
+            }
+            
+            // Delete button is only visible if logged in AND it's the current user's mock resource
+            const deleteButton = isLoggedIn && resource.uploader === currentUploader ? `
+                <button data-id="${resource.id}" data-title="${resource.title}" class="delete-resource text-xs text-red-500 hover:text-red-700 mt-2 sm:mt-0 ml-4">
+                    Delete
+                </button>
+            ` : '';
+
+            // The Access link/button
+            const accessLink = isUrl(resource.link) ?
+                `<a href="${resource.link}" target="_blank" class="text-sm font-semibold text-secondary hover:text-green-700 transition flex items-center">${accessButtonText}${accessIcon}</a>` :
+                `<a href="#" data-link="${resource.link}" class="${accessLinkClass} text-sm font-semibold text-secondary hover:text-green-700 transition flex items-center">${accessButtonText}${accessIcon}</a>`;
+
+            // Explain Concept Button (updated icon)
+            const explainButton = `
+                <button data-title="${resource.title}" data-department="${resource.department}" class="explain-concept text-xs font-semibold px-2 py-1 rounded-lg bg-blue-100 text-primary hover:bg-blue-200 transition ml-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17H5a2 2 0 00-2 2v2.923l1.699-.922.004-.002A4.987 4.987 0 005 20c.532 0 1.056-.126 1.545-.362l.006-.003.543-.27A3 3 0 019 16.5V11a3 3 0 00-3-3H4a2 2 0 00-2 2v4a2 2 0 002 2h5.663zM14 6a3 3 0 013-3h2a2 2 0 012 2v4a2 2 0 01-2 2h-5L14 6z" />
+                    </svg>
+                    Explain Concept
+                </button>
+            `;
+
+            return `
+                <div class="${cardClass}">
+                    <div>
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${isFeatured ? 'bg-accent text-gray-800' : 'bg-primary text-white'}">${resource.type}</span>
+                        <h3 class="font-bold text-lg text-gray-900 mt-1">${resource.title}</h3>
+                        <p class="text-sm text-gray-600">
+                            <span class="font-medium text-primary">${resource.department}</span> • Uploaded by ${resource.uploader}
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-3 sm:mt-0">
+                        ${accessLink}
+                        ${explainButton}
+                        ${deleteButton}
+                    </div>
+                </div>
+            `;
+        };
+
+        /**
+         * Filters resources based on search and department selection, then renders.
+         */
+        const handleSearchAndFilter = () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const deptFilter = filterDepartment.value;
+
+            const filtered = resources.filter(resource => {
+                const matchesSearch = resource.title.toLowerCase().includes(searchTerm) ||
+                                      resource.uploader.toLowerCase().includes(searchTerm) ||
+                                      resource.department.toLowerCase().includes(searchTerm);
+                const matchesDepartment = !deptFilter || resource.department === deptFilter;
+
+                return matchesSearch && matchesDepartment;
+            });
+
+            // Render All Resources
+            const allHtml = filtered.map(r => createResourceCard(r)).join('');
+            resourceListEl.innerHTML = allHtml;
+            noResultsEl.classList.toggle('hidden', filtered.length > 0);
+
+            // Re-attach listeners for dynamic buttons
+            attachAccessListeners();
+            attachDeleteListeners();
+            attachExplainListeners();
+        };
+
+        /**
+         * Renders the featured resources section.
+         */
+        const renderFeaturedResources = () => {
+            const featured = resources.filter(r => r.featured).slice(0, 3);
+            const featuredHtml = featured.map(r => createResourceCard(r, true)).join('');
+            featuredListEl.innerHTML = featuredHtml;
+        };
+
+        /**
+         * Main function to render all dynamic content.
+         */
+        const renderAllContent = () => {
+            renderFeaturedResources();
+            handleSearchAndFilter();
+        };
+
+        // --- INTERACTION HANDLERS ---
+
+        /**
+         * Handles new resource upload.
+         */
+        const handleUpload = (e) => {
+            e.preventDefault();
+            if (!isLoggedIn) return;
+
+            const title = document.getElementById('resource-title').value.trim();
+            const department = document.getElementById('resource-department').value;
+            const type = document.getElementById('resource-type').value;
+
+            let link = '';
+            
+            // 1. Check for File Upload
+            if (resourceFileInput.files.length > 0) {
+                const file = resourceFileInput.files[0];
+                const fileSizeKB = (file.size / 1024).toFixed(1);
+                
+                // Format file size for display (KB vs MB)
+                const fileSize = fileSizeKB > 1024 
+                    ? (fileSizeKB / 1024).toFixed(2) + ' MB'
+                    : fileSizeKB + ' KB';
+                
+                // Store file metadata as the link content
+                link = `[MOCK_FILE]: ${file.name} (${fileSize})`;
+
+            } 
+            // 2. Check for Text Link/Description
+            else {
+                link = resourceDescriptionTextarea.value.trim();
+            }
+
+            if (!link) {
+                showTemporaryMessage('Please select a file or provide a link/description.', 'bg-red-100 text-red-700 border border-red-400');
+                return; // Block upload if no file and no text
+            }
+
+
+            const newResource = {
+                id: Date.now().toString(),
+                title,
+                department,
+                type,
+                uploader: currentUploader,
+                link: link,
+                featured: resources.length % 3 === 0
+            };
+
+            resources.unshift(newResource);
+            saveResources(resources);
+
+            // Show success message briefly
+            uploadForm.reset();
+            const msgEl = document.getElementById('upload-message');
+            msgEl.classList.remove('hidden');
+            setTimeout(() => msgEl.classList.add('hidden'), 3000);
+
+            renderAllContent(); // Re-render UI
+            showTemporaryMessage(`Resource "${title}" uploaded successfully!`, 'bg-secondary/20 text-secondary border border-secondary');
+        };
+
+        /**
+         * Handles resource deletion (Teacher only).
+         */
+        const deleteResource = (id, title) => {
+            // Using a simple non-blocking confirm dialog as a final check
+            if (window.confirm(`Are you sure you want to delete the resource: "${title}"? This cannot be undone.`)) {
+                resources = resources.filter(r => r.id !== id);
+                saveResources(resources);
+                renderAllContent();
+                showTemporaryMessage(`Resource "${title}" was deleted.`, 'bg-red-100 text-red-700 border border-red-400');
+            }
+        };
+
+        /**
+         * Handles access for resources (text or mock file).
+         */
+        const handleAccessClick = (e) => {
+            e.preventDefault();
+            const resourceLink = e.target.dataset.link;
+            const resourceTitle = e.target.closest('.flex-col').querySelector('h3').textContent;
+
+            if (isMockFile(resourceLink)) {
+                // Simulation of a file download
+                const filename = resourceLink.replace('[MOCK_FILE]: ', '');
+                showTemporaryMessage(`Starting simulated download for: ${filename}`, 'bg-secondary/20 text-secondary border border-secondary');
+            }
+            // This runs for text descriptions/instructions
+            else {
+                 showTemporaryMessage(`Accessing "${resourceTitle}": ${resourceLink}`, 'bg-blue-100 text-primary border border-primary');
+            }
+        };
+
+        /**
+         * Attaches event listeners to dynamically created access links.
+         */
+        const attachAccessListeners = () => {
+            document.querySelectorAll('.access-resource').forEach(link => {
+                link.addEventListener('click', handleAccessClick);
+            });
+        };
+
+        /**
+         * Attaches event listeners to dynamically created delete buttons.
+         */
+        const attachDeleteListeners = () => {
+            if (isLoggedIn) {
+                document.querySelectorAll('.delete-resource').forEach(button => {
+                    button.onclick = (e) => {
+                        e.stopPropagation();
+                        const title = e.target.dataset.title;
+                        deleteResource(e.target.dataset.id, title);
+                    };
+                });
+            }
+        };
+
+        /**
+         * Attaches event listeners to dynamically created Explain Concept buttons.
+         */
+        const attachExplainListeners = () => {
+            document.querySelectorAll('.explain-concept').forEach(button => {
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    const title = e.target.dataset.title;
+                    const department = e.target.dataset.department;
+                    explainResourceConcept(title, department);
+                };
+            });
+        };
+
+        /**
+         * Handles mock student feedback submission.
+         */
+        const handleFeedback = (e) => {
+            e.preventDefault();
+            const feedbackText = document.getElementById('feedback-text').value.trim();
+
+            if (feedbackText.length > 5) {
+                document.getElementById('feedback-form').reset();
+                const msgEl = document.getElementById('feedback-message');
+                msgEl.classList.remove('hidden');
+                setTimeout(() => msgEl.classList.add('hidden'), 3000);
+            }
+        };
+
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            // Initial UI setup
+            updateAuthUI();
+            renderAllContent();
+
+            // Attach event listeners
+            loginForm.addEventListener('submit', handleLogin);
+            uploadForm.addEventListener('submit', handleUpload);
+            document.getElementById('feedback-form').addEventListener('submit', handleFeedback);
+
+            // LLM Button listener
+            document.getElementById('generate-description-btn').addEventListener('click', generateResourceDescription);
+
+            // Search and filter listeners
+            searchInput.addEventListener('input', handleSearchAndFilter);
+            filterDepartment.addEventListener('change', handleSearchAndFilter);
+        };
+    </script>
+</body>
+</html>
